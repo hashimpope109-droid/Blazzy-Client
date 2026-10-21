@@ -1,0 +1,31 @@
+plugins {
+    id 'net.fabricmc.fabric-loom' version '1.17-SNAPSHOT'
+}
+
+version = project.mod_version
+group = 'gg.blazzy'
+
+base { archivesName = 'blazzy-grid-menu-26.2' }
+
+repositories { mavenCentral() }
+
+dependencies {
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    implementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    implementation include(fabricApi.module('fabric-api-base', project.fabric_version))
+    implementation include(fabricApi.module('fabric-key-mapping-api-v1', project.fabric_version))
+    implementation include(fabricApi.module('fabric-lifecycle-events-v1', project.fabric_version))
+}
+
+processResources {
+    inputs.property 'version', project.version
+    filesMatching('fabric.mod.json') { expand 'version': project.version }
+}
+
+tasks.withType(JavaCompile).configureEach { options.release = 25 }
+
+java {
+    withSourcesJar()
+    sourceCompatibility = JavaVersion.VERSION_25
+    targetCompatibility = JavaVersion.VERSION_25
+}

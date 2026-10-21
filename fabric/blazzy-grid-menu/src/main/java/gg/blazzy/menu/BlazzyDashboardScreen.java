@@ -13,6 +13,7 @@ final class BlazzyDashboardScreen extends Screen {
     private static final int ORANGE = 0xFFFF7417;
     private static final int GREEN = 0xFF20C878;
     private static final int RED = 0xFFD94264;
+    private static final int PAGE_SIZE = 12;
     private static final List<Module> MODULES = List.of(
         new Module("fps_boost", "FPS", "Performance preset", "⚡"),
         new Module("cps", "CPS", "Clicks per second", "◉"),
@@ -25,12 +26,25 @@ final class BlazzyDashboardScreen extends Screen {
         new Module("better_f3", "BetterF3", "Clean debug screen", "F3"),
         new Module("fullbright", "Fullbright", "Brighter worlds", "☀"),
         new Module("iris", "Iris Shaders", "Shader controls", "◈"),
-        new Module("dynamic_fps", "Dynamic FPS", "Idle FPS saver", "▥")
+        new Module("dynamic_fps", "Dynamic FPS", "Idle FPS saver", "▥"),
+        new Module("ping", "Ping Display", "Network latency HUD", "↔"),
+        new Module("coordinates", "Coordinates", "Position and biome HUD", "⌖"),
+        new Module("combo", "Combo Counter", "Consecutive hit counter", "×"),
+        new Module("potions", "Potion HUD", "Active effect timers", "+"),
+        new Module("speed", "Speed Meter", "Movement speed HUD", "»"),
+        new Module("memory", "Memory HUD", "RAM usage monitor", "▤"),
+        new Module("toggle_sneak", "Toggle Sneak", "Persistent sneak control", "⇩"),
+        new Module("crosshair", "Crosshair", "Shape and hit colour", "+"),
+        new Module("motion_blur", "Motion Blur", "Adjustable camera blur", "≈"),
+        new Module("block_overlay", "Block Overlay", "Selection colour", "□"),
+        new Module("damage_indicator", "Damage Indicator", "Combat health display", "♥"),
+        new Module("waypoints", "Waypoints", "Saved world markers", "◆")
     );
 
     private final Screen parent;
     private TextFieldWidget search;
     private String filter = "";
+    private int page = 0;
 
     BlazzyDashboardScreen(Screen parent) {
         super(Text.literal("Blazzy Client"));
@@ -47,6 +61,7 @@ final class BlazzyDashboardScreen extends Screen {
         search.setText(filter);
         search.setChangedListener(value -> {
             filter = value;
+            page = 0;
             rebuildCards();
         });
         addDrawableChild(search);
@@ -59,10 +74,13 @@ final class BlazzyDashboardScreen extends Screen {
         int left = (width - panelWidth) / 2;
         int cardGap = 8;
         int cardWidth = (panelWidth - 32 - cardGap * 2) / 3;
+        List<Module> visible = visibleModules();
+        int pageCount = Math.max(1, (visible.size() + PAGE_SIZE - 1) / PAGE_SIZE);
+        page = Math.max(0, Math.min(page, pageCount - 1));
+        int start = page * PAGE_SIZE;
+        int end = Math.min(visible.size(), start + PAGE_SIZE);
         int index = 0;
-        String query = filter.trim().toLowerCase(Locale.ROOT);
-        for (Module module : MODULES) {
-            if (!query.isEmpty() && !module.name.toLowerCase(Locale.ROOT).contains(query)) continue;
+        for (Module module : visible.subList(start, end)) {
             int col = index % 3;
             int row = index / 3;
             int x = left + 16 + col * (cardWidth + cardGap);
@@ -77,6 +95,13 @@ final class BlazzyDashboardScreen extends Screen {
             ).position(x + 8, y + 55).size(cardWidth - 16, 18).build());
             index++;
         }
+        int pagerY = Math.min(height - 30, 72 + 4 * 82 + 2);
+        addDrawableChild(ButtonWidget.builder(Text.literal("‹"), button -> { page--; rebuildCards(); })
+            .position(left + panelWidth / 2 - 56, pagerY).size(24, 18).build());
+        addDrawableChild(ButtonWidget.builder(Text.literal((page + 1) + " / " + pageCount), button -> {})
+            .position(left + panelWidth / 2 - 28, pagerY).size(56, 18).build());
+        addDrawableChild(ButtonWidget.builder(Text.literal("›"), button -> { page++; rebuildCards(); })
+            .position(left + panelWidth / 2 + 32, pagerY).size(24, 18).build());
         addDrawableChild(ButtonWidget.builder(Text.literal("X"), button -> close())
             .position(left + panelWidth - 26, 18).size(20, 20).build());
     }
@@ -86,7 +111,7 @@ final class BlazzyDashboardScreen extends Screen {
         context.fill(0, 0, width, height, 0xC8050609);
         int panelWidth = Math.min(760, width - 30);
         int left = (width - panelWidth) / 2;
-        int bottom = Math.min(height - 12, 72 + 4 * 82);
+        int bottom = Math.min(height - 6, 72 + 4 * 82 + 26);
         context.fill(left, 8, left + panelWidth, bottom, 0xF20B0C11);
         context.fill(left, 8, left + panelWidth, 11, ORANGE);
         context.drawTextWithShadow(textRenderer, Text.literal("BLAZZY CLIENT"), left + 16, 23, 0xFFFFFFFF);
@@ -96,10 +121,11 @@ final class BlazzyDashboardScreen extends Screen {
 
         int cardGap = 8;
         int cardWidth = (panelWidth - 32 - cardGap * 2) / 3;
+        List<Module> visible = visibleModules();
+        int start = Math.min(visible.size(), page * PAGE_SIZE);
+        int end = Math.min(visible.size(), start + PAGE_SIZE);
         int index = 0;
-        String query = filter.trim().toLowerCase(Locale.ROOT);
-        for (Module module : MODULES) {
-            if (!query.isEmpty() && !module.name.toLowerCase(Locale.ROOT).contains(query)) continue;
+        for (Module module : visible.subList(start, end)) {
             int col = index % 3;
             int row = index / 3;
             int x = left + 16 + col * (cardWidth + cardGap);
@@ -115,6 +141,15 @@ final class BlazzyDashboardScreen extends Screen {
             index++;
         }
         super.render(context, mouseX, mouseY, delta);
+    }
+
+    private List<Module> visibleModules() {
+        String query = filter.trim().toLowerCase(Locale.ROOT);
+        if (query.isEmpty()) return MODULES;
+        return MODULES.stream()
+            .filter(module -> module.name.toLowerCase(Locale.ROOT).contains(query)
+                || module.description.toLowerCase(Locale.ROOT).contains(query))
+            .toList();
     }
 
     @Override

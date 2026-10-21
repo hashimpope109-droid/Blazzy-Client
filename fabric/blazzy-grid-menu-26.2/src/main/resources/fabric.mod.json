@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "id": "blazzy_grid_menu",
+  "version": "${version}",
+  "name": "Blazzy Client Modules",
+  "description": "Original Blazzy Client module dashboard for Minecraft 26.2.",
+  "environment": "client",
+  "license": "MIT",
+  "authors": ["Blazzy Client"],
+  "entrypoints": { "client": ["gg.blazzy.menu.BlazzyClientMod"] },
+  "depends": {
+    "fabricloader": ">=0.19.3",
+    "minecraft": "~26.2",
+    "java": ">=25",
+    "fabric-api-base": "*",
+    "fabric-key-mapping-api-v1": "*",
+    "fabric-lifecycle-events-v1": "*"
+  }
+}

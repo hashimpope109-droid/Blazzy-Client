@@ -6,6 +6,7 @@ on:
     paths:
       - 'fabric/blazzy-grid-menu/**'
       - 'fabric/blazzy-grid-menu-1.21.4/**'
+      - 'fabric/blazzy-grid-menu-26.2/**'
       - '.github/workflows/build-blazzy-grid-menu.yml'
 
 permissions:
@@ -43,6 +44,22 @@ jobs:
           status=$?
           echo "$status" > build-status.txt
           exit "$status"
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: gradle
+      - name: Compile Fabric 26.2 mod
+        id: compile_262
+        continue-on-error: true
+        working-directory: fabric/blazzy-grid-menu-26.2
+        run: |
+          chmod +x gradlew
+          set +e
+          ./gradlew build --no-daemon --stacktrace > build.log 2>&1
+          status=$?
+          echo "$status" > build-status.txt
+          exit "$status"
       - name: Publish compiler result
         if: always()
         run: |
@@ -51,11 +68,16 @@ jobs:
           cp fabric/blazzy-grid-menu/build-status.txt build-output/blazzy-grid-menu-build-status.txt
           cp fabric/blazzy-grid-menu-1.21.4/build.log build-output/blazzy-grid-menu-1.21.4-build.log
           cp fabric/blazzy-grid-menu-1.21.4/build-status.txt build-output/blazzy-grid-menu-1.21.4-build-status.txt
+          cp fabric/blazzy-grid-menu-26.2/build.log build-output/blazzy-grid-menu-26.2-build.log
+          cp fabric/blazzy-grid-menu-26.2/build-status.txt build-output/blazzy-grid-menu-26.2-build-status.txt
           if [ -f fabric/blazzy-grid-menu/build/libs/blazzy-grid-menu-1.0.0.jar ]; then
             cp fabric/blazzy-grid-menu/build/libs/blazzy-grid-menu-1.0.0.jar build-output/blazzy-grid-menu-1.21.11.jar
           fi
           if [ -f fabric/blazzy-grid-menu-1.21.4/build/libs/blazzy-grid-menu-1.21.4-1.0.0.jar ]; then
             cp fabric/blazzy-grid-menu-1.21.4/build/libs/blazzy-grid-menu-1.21.4-1.0.0.jar build-output/blazzy-grid-menu-1.21.4.jar
+          fi
+          if [ -f fabric/blazzy-grid-menu-26.2/build/libs/blazzy-grid-menu-26.2-1.1.0.jar ]; then
+            cp fabric/blazzy-grid-menu-26.2/build/libs/blazzy-grid-menu-26.2-1.1.0.jar build-output/blazzy-grid-menu-26.2.jar
           fi
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
