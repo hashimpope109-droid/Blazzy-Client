@@ -1,0 +1,47 @@
+name: Build Blazzy Grid Menu
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'fabric/blazzy-grid-menu/**'
+      - '.github/workflows/build-blazzy-grid-menu.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: gradle
+      - name: Compile Fabric mod
+        id: compile
+        continue-on-error: true
+        working-directory: fabric/blazzy-grid-menu
+        run: |
+          chmod +x gradlew
+          set +e
+          ./gradlew build --no-daemon --stacktrace > build.log 2>&1
+          status=$?
+          echo "$status" > build-status.txt
+          exit "$status"
+      - name: Publish compiler result
+        if: always()
+        run: |
+          mkdir -p build-output
+          cp fabric/blazzy-grid-menu/build.log build-output/blazzy-grid-menu-build.log
+          cp fabric/blazzy-grid-menu/build-status.txt build-output/blazzy-grid-menu-build-status.txt
+          if [ -f fabric/blazzy-grid-menu/build/libs/blazzy-grid-menu-1.0.0.jar ]; then
+            cp fabric/blazzy-grid-menu/build/libs/blazzy-grid-menu-1.0.0.jar build-output/blazzy-grid-menu-1.21.11.jar
+          fi
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add build-output
+          git diff --cached --quiet || git commit -m 'Build Blazzy grid menu [skip ci]'
+          git push

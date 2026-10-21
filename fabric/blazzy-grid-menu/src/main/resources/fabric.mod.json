@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "id": "blazzy_grid_menu",
+  "version": "${version}",
+  "name": "Blazzy Client Modules",
+  "description": "The native Blazzy Client module dashboard opened with Right Shift.",
+  "environment": "client",
+  "license": "MIT",
+  "authors": ["Blazzy Client"],
+  "entrypoints": {
+    "client": ["gg.blazzy.menu.BlazzyClientMod"]
+  },
+  "depends": {
+    "fabricloader": ">=0.16.0",
+    "minecraft": ">=1.21.11 <26",
+    "fabric-api": "*"
+  }
+}
