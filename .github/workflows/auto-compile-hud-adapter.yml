@@ -34,11 +34,16 @@ jobs:
         shell: bash
         env:
           REQUESTED_VERSION: ${{ inputs.minecraft_version }}
+          EVENT_NAME: ${{ github.event_name }}
         run: |
           set -euo pipefail
           version="$REQUESTED_VERSION"
           if [ -z "$version" ]; then
-            version="$(curl -fsSL https://piston-meta.mojang.com/mc/game/version_manifest_v2.json | jq -r '.latest.release')"
+            if [ "$EVENT_NAME" = push ]; then
+              version="1.21.8"
+            else
+              version="$(curl -fsSL https://piston-meta.mojang.com/mc/game/version_manifest_v2.json | jq -r '.latest.release')"
+            fi
           fi
           if ! [[ "$version" =~ ^[0-9]+\.[0-9]+(\.[0-9]+)?$ ]]; then
             echo "Invalid Minecraft version: $version" >&2
