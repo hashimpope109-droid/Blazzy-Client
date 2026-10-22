@@ -112,6 +112,12 @@ jobs:
           data['name'] = f"Blazzy Client Modules ({os.environ['MC']})"
           data['depends']['minecraft'] = os.environ['MC']
           path.write_text(json.dumps(data, indent=2) + '\n')
+          if os.environ['MC'] == '26.1.2':
+              for java in Path('src/main/java').rglob('*.java'):
+                  source = java.read_text()
+                  source = source.replace('minecraft.gui.setScreen(', 'minecraft.setScreen(')
+                  source = source.replace('minecraft.gui.screen()', 'minecraft.screen')
+                  java.write_text(source)
           PY
           chmod +x gradlew
           args=(build --no-daemon --stacktrace "-Pminecraft_version=$MC" "-Ploader_version=$LOADER" "-Pfabric_version=$FABRIC_API")
