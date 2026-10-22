@@ -111,7 +111,7 @@ jobs:
           chmod +x gradlew
           args=(build --no-daemon --stacktrace "-Pminecraft_version=$MC" "-Ploader_version=$LOADER" "-Pfabric_version=$FABRIC_API")
           if [ "$MAPPINGS" != official ]; then args+=("-Pyarn_mappings=$MAPPINGS"); fi
-          ./gradlew "${args[@]}"
+          ./gradlew "${args[@]}" 2>&1 | tee build.log
           jar="$(find build/libs -maxdepth 1 -type f -name '*.jar' ! -name '*-sources.jar' ! -name '*-dev.jar' | head -1)"
           test -n "$jar"
           mkdir -p "$GITHUB_WORKSPACE/build-output/adapters"
@@ -153,5 +153,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: blazzy-hud-adapter-build-log
-          path: /tmp/blazzy-auto-adapter/build/reports/
+          path: |
+            /tmp/blazzy-auto-adapter/build.log
+            /tmp/blazzy-auto-adapter/build/reports/
           if-no-files-found: ignore
