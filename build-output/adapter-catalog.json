@@ -4,6 +4,10 @@
     "1.21.8": {
       "file": "blazzy-grid-menu-1.21.8.jar",
       "sha256": "3cb6f269c8779658c7e84b0bd381054368422fbecf66f0c6ef96269bacb70016"
+    },
+    "26.1.2": {
+      "file": "blazzy-grid-menu-26.1.2.jar",
+      "sha256": "64afd2f0d966692336647a15904c2ee931b3490ca8b89e39fbb1c43f5f55f3e0"
     }
   }
 }
