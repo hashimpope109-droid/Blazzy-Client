@@ -1,0 +1,157 @@
+name: Auto Compile Blazzy HUD Adapter
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/auto-compile-hud-adapter.yml'
+  workflow_dispatch:
+    inputs:
+      minecraft_version:
+        description: Exact Minecraft version (for example 1.22 or 26.3)
+        required: true
+        type: string
+  schedule:
+    - cron: '17 4 * * *'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: blazzy-hud-adapter-publisher
+  cancel-in-progress: false
+
+jobs:
+  compile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve Minecraft and Fabric versions
+        id: versions
+        shell: bash
+        env:
+          REQUESTED_VERSION: ${{ inputs.minecraft_version }}
+        run: |
+          set -euo pipefail
+          version="$REQUESTED_VERSION"
+          if [ -z "$version" ]; then
+            version="$(curl -fsSL https://piston-meta.mojang.com/mc/game/version_manifest_v2.json | jq -r '.latest.release')"
+          fi
+          if ! [[ "$version" =~ ^[0-9]+\.[0-9]+(\.[0-9]+)?$ ]]; then
+            echo "Invalid Minecraft version: $version" >&2
+            exit 1
+          fi
+          if [ -f build-output/adapter-catalog.json ] && jq -e --arg v "$version" '.versions[$v]' build-output/adapter-catalog.json >/dev/null; then
+            echo "Adapter $version is already published."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          loader="$(curl -fsSL https://meta.fabricmc.net/v2/versions/loader | jq -r '[.[] | select(.stable)][0].version')"
+          api="$(curl -fsSL https://maven.fabricmc.net/net/fabricmc/fabric-api/fabric-api/maven-metadata.xml | VERSION="$version" python3 -c 'import os,sys,xml.etree.ElementTree as E; v=os.environ["VERSION"]; xs=[x.text for x in E.fromstring(sys.stdin.read()).findall("./versioning/versions/version") if x.text and x.text.endswith("+"+v)]; print(xs[-1] if xs else "")')"
+          if [ -z "$loader" ] || [ -z "$api" ]; then
+            echo "Fabric loader or API is not published for Minecraft $version yet." >&2
+            exit 1
+          fi
+          major="${version%%.*}"
+          if [ "$major" -ge 26 ]; then
+            source_dir="fabric/blazzy-grid-menu-26.2"
+            java_version=25
+            mappings="official"
+          else
+            patch="$(cut -d. -f3 <<<"$version")"
+            patch="${patch:-0}"
+            if [ "$patch" -le 8 ]; then source_dir="fabric/blazzy-grid-menu-1.21.4"; else source_dir="fabric/blazzy-grid-menu"; fi
+            java_version=21
+            mappings="$(curl -fsSL "https://meta.fabricmc.net/v2/versions/yarn/$version" | jq -r '.[0].version // empty')"
+            if [ -z "$mappings" ]; then
+              echo "Yarn mappings are not published for Minecraft $version yet." >&2
+              exit 1
+            fi
+          fi
+          echo "skip=false" >> "$GITHUB_OUTPUT"
+          echo "minecraft=$version" >> "$GITHUB_OUTPUT"
+          echo "loader=$loader" >> "$GITHUB_OUTPUT"
+          echo "fabric_api=$api" >> "$GITHUB_OUTPUT"
+          echo "mappings=$mappings" >> "$GITHUB_OUTPUT"
+          echo "source_dir=$source_dir" >> "$GITHUB_OUTPUT"
+          echo "java=$java_version" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/setup-java@v4
+        if: steps.versions.outputs.skip != 'true'
+        with:
+          distribution: temurin
+          java-version: ${{ steps.versions.outputs.java }}
+          cache: gradle
+
+      - name: Compile exact-version adapter
+        if: steps.versions.outputs.skip != 'true'
+        shell: bash
+        env:
+          MC: ${{ steps.versions.outputs.minecraft }}
+          LOADER: ${{ steps.versions.outputs.loader }}
+          FABRIC_API: ${{ steps.versions.outputs.fabric_api }}
+          MAPPINGS: ${{ steps.versions.outputs.mappings }}
+          SOURCE_DIR: ${{ steps.versions.outputs.source_dir }}
+        run: |
+          set -euo pipefail
+          cp -a "$SOURCE_DIR" /tmp/blazzy-auto-adapter
+          cd /tmp/blazzy-auto-adapter
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          path = Path('src/main/resources/fabric.mod.json')
+          data = json.loads(path.read_text())
+          data['name'] = f"Blazzy Client Modules ({os.environ['MC']})"
+          data['depends']['minecraft'] = os.environ['MC']
+          path.write_text(json.dumps(data, indent=2) + '\n')
+          PY
+          chmod +x gradlew
+          args=(build --no-daemon --stacktrace "-Pminecraft_version=$MC" "-Ploader_version=$LOADER" "-Pfabric_version=$FABRIC_API")
+          if [ "$MAPPINGS" != official ]; then args+=("-Pyarn_mappings=$MAPPINGS"); fi
+          ./gradlew "${args[@]}"
+          jar="$(find build/libs -maxdepth 1 -type f -name '*.jar' ! -name '*-sources.jar' ! -name '*-dev.jar' | head -1)"
+          test -n "$jar"
+          mkdir -p "$GITHUB_WORKSPACE/build-output/adapters"
+          cp "$jar" "$GITHUB_WORKSPACE/build-output/adapters/blazzy-grid-menu-$MC.jar"
+
+      - name: Verify and publish adapter catalog
+        if: steps.versions.outputs.skip != 'true'
+        shell: bash
+        env:
+          MC: ${{ steps.versions.outputs.minecraft }}
+        run: |
+          set -euo pipefail
+          file="blazzy-grid-menu-$MC.jar"
+          jar="build-output/adapters/$file"
+          unzip -t "$jar"
+          unzip -p "$jar" fabric.mod.json | jq -e --arg v "$MC" '.id == "blazzy_grid_menu" and .depends.minecraft == $v'
+          sha="$(sha256sum "$jar" | cut -d' ' -f1)"
+          test -f build-output/adapter-catalog.json || printf '{"schemaVersion":1,"versions":{}}\n' > build-output/adapter-catalog.json
+          FILE="$file" SHA="$sha" python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          path = Path('build-output/adapter-catalog.json')
+          data = json.loads(path.read_text())
+          data.setdefault('versions', {})[os.environ['MC']] = {
+              'file': os.environ['FILE'],
+              'sha256': os.environ['SHA'],
+          }
+          path.write_text(json.dumps(data, indent=2, sort_keys=True) + '\n')
+          PY
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add build-output/adapter-catalog.json "$jar"
+          git commit -m "Auto compile Blazzy HUD adapter for Minecraft $MC [skip ci]"
+          git pull --rebase origin main
+          git push origin HEAD:main
+
+      - name: Upload failed compiler log
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: blazzy-hud-adapter-build-log
+          path: /tmp/blazzy-auto-adapter/build/reports/
+          if-no-files-found: ignore
