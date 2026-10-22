@@ -40,7 +40,7 @@ jobs:
           version="$REQUESTED_VERSION"
           if [ -z "$version" ]; then
             if [ "$EVENT_NAME" = push ]; then
-              version="26.1.2"
+              version="26.3"
             else
               version="$(curl -fsSL https://piston-meta.mojang.com/mc/game/version_manifest_v2.json | jq -r '.latest.release')"
             fi
