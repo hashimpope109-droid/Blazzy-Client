@@ -1,4 +1,4 @@
 {
-  "version": "1.1.27",
+  "version": "1.1.28",
   "changelog": "### Release 1.1.25\n\n- Adds local on-demand HUD compilation inside the Windows launcher for supported Minecraft 1.21+ Fabric versions.\n- Bundles legacy, modern, and official-mapping source templates plus their verified Gradle wrappers.\n- Automatically resolves Fabric Loader, Fabric API, and Yarn mappings for the selected version.\n- Downloads a managed JDK 21 or JDK 25 when compilation requires it and caches successful exact-version JARs.\n- Validates the compiled JAR, Fabric mod ID, and exact Minecraft dependency before installation.\n- Falls back safely when mappings are unavailable or source changes are required; Minecraft launches without an incompatible adapter."
 }

@@ -66,6 +66,7 @@ const BLAZZY_GRID_MENU_1214_JAR = fileURLToPath(new URL('../resources/blazzy-gri
 const BLAZZY_GRID_MENU_1218_JAR = fileURLToPath(new URL('../resources/blazzy-grid-menu-1.21.8.jar', import.meta.url));
 const BLAZZY_GRID_MENU_12110_JAR = fileURLToPath(new URL('../resources/blazzy-grid-menu-1.21.10.jar', import.meta.url));
 const BLAZZY_GRID_MENU_JAR = fileURLToPath(new URL('../resources/blazzy-grid-menu-1.21.11.jar', import.meta.url));
+const BLAZZY_GRID_MENU_2612_JAR = fileURLToPath(new URL('../resources/blazzy-grid-menu-26.1.2.jar', import.meta.url));
 const BLAZZY_CLIENT_HUD_262_JAR = fileURLToPath(new URL('../resources/blazzy-client-hud-26.2.jar', import.meta.url));
 const BLAZZY_ADAPTER_CATALOG_URL = 'https://raw.githubusercontent.com/hashimpope109-droid/Blazzy-Client/main/build-output/adapter-catalog.json';
 const BLAZZY_ADAPTER_BASE_URL = 'https://raw.githubusercontent.com/hashimpope109-droid/Blazzy-Client/main/build-output/adapters';
@@ -177,6 +178,8 @@ export async function ensureBlazzyGridMenu(gameDir, gameVersion, onLog = null) {
   const recentVersions = new Set(['1.21.9', '1.21.10']);
   let bundledJar = version === '26.2'
     ? BLAZZY_CLIENT_HUD_262_JAR
+    : version === '26.1.2'
+      ? BLAZZY_GRID_MENU_2612_JAR
     : version === '1.21.11'
       ? BLAZZY_GRID_MENU_JAR
       : recentVersions.has(version)
@@ -187,6 +190,8 @@ export async function ensureBlazzyGridMenu(gameDir, gameVersion, onLog = null) {
   let destinationName = bundledJar
     ? version === '26.2'
       ? 'blazzy-client-hud-26.2.jar'
+      : version === '26.1.2'
+        ? 'blazzy-grid-menu-26.1.2.jar'
       : `blazzy-grid-menu-${version === '1.21.11'
         ? '1.21.11'
         : recentVersions.has(version)

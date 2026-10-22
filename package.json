@@ -1,7 +1,7 @@
 {
   "name": "blazzy-client",
   "private": true,
-  "version": "1.1.27",
+  "version": "1.1.28",
   "description": "Blazzy Client is a fast Minecraft launcher based on OpenLauncher",
   "author": "Blazzy Client contributors; based on OpenLauncher by CesarGarza55",
   "type": "module",
