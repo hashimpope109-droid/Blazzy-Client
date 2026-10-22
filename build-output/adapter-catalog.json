@@ -1,4 +1,9 @@
 {
   "schemaVersion": 1,
-  "versions": {}
+  "versions": {
+    "1.21.8": {
+      "file": "blazzy-grid-menu-1.21.8.jar",
+      "sha256": "3cb6f269c8779658c7e84b0bd381054368422fbecf66f0c6ef96269bacb70016"
+    }
+  }
 }
