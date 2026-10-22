@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' https: data:; style-src 'self'; script-src 'self'; connect-src https://api.modrinth.com https://piston-meta.mojang.com https://meta.fabricmc.net;">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blazzy Client</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="titlebar">
+      <div class="brand"><img src="../assets/logo.png" alt=""><span>BLAZZY</span><em>CLIENT</em></div>
+      <div class="drag-region"></div>
+      <div class="window-actions">
+        <button id="minimize" aria-label="Minimize">—</button>
+        <button id="close" aria-label="Close">×</button>
+      </div>
+    </header>
+
+    <aside class="sidebar">
+      <nav>
+        <button class="nav-item active" data-page="home"><span>⌂</span> Home</button>
+        <button class="nav-item" data-page="mods"><span>◆</span> Mods</button>
+        <button class="nav-item" data-page="cosmetics"><span>✦</span> Cosmetics <b>NEW</b></button>
+        <button class="nav-item" data-page="settings"><span>⚙</span> Settings</button>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="status"><i></i><div><small>SERVICES</small><strong>All systems online</strong></div></div>
+        <button class="profile-mini" data-page="settings">
+          <span class="avatar" id="avatarLetter">P</span>
+          <span><strong id="sidebarName">Player</strong><small>Offline profile</small></span>
+          <span class="chevron">›</span>
+        </button>
+      </div>
+    </aside>
+
+    <main>
+      <section class="page active" id="home">
+        <div class="hero">
+          <div class="hero-shade"></div>
+          <div class="hero-content">
+            <span class="eyebrow">BLAZZY CLIENT · FABRIC EDITION</span>
+            <h1>PLAY <span>WITHOUT</span><br>LIMITS.</h1>
+            <p>A fast, focused Minecraft experience built for PvP,<br>survival and everything between.</p>
+            <div class="launch-row">
+              <button class="play-button" id="playButton"><span class="play-icon">▶</span><span><b>LAUNCH GAME</b><small id="playSubtitle">Ready to play</small></span></button>
+              <label class="version-select"><small>VERSION</small><select id="versionSelect"><option>Loading…</option></select></label>
+            </div>
+            <div class="progress-wrap hidden" id="progressWrap"><div class="progress-track"><i id="progressBar"></i></div><span id="progressText">Preparing…</span></div>
+          </div>
+          <div class="hero-badge"><img src="../assets/logo.png" alt="Blazzy"><span>PERFORMANCE<br><b>UNLEASHED</b></span></div>
+        </div>
+        <div class="stats-grid">
+          <article><span class="stat-icon">⚡</span><div><small>PERFORMANCE</small><strong>Optimized</strong></div><em>ULTRA</em></article>
+          <article><span class="stat-icon">◈</span><div><small>LOADER</small><strong>Fabric 0.16+</strong></div><em>READY</em></article>
+          <article><span class="stat-icon">⬡</span><div><small>MODRINTH</small><strong>Direct installs</strong></div><em>LIVE</em></article>
+          <article><span class="stat-icon">✦</span><div><small>COSMETICS</small><strong id="equippedText">Ember Cape</strong></div><em>ACTIVE</em></article>
+        </div>
+      </section>
+
+      <section class="page content-page" id="mods">
+        <div class="page-heading"><div><span class="eyebrow">MODRINTH LIBRARY</span><h2>Discover Mods</h2><p>Fabric mods matched to your selected Minecraft version.</p></div><button class="ghost-button" id="openMods">Open Mods Folder</button></div>
+        <div class="searchbar"><span>⌕</span><input id="modSearch" placeholder="Search Sodium, AppleSkin, voice chat…"><button id="searchButton">SEARCH</button></div>
+        <div class="quick-tags"><button data-query="performance">Performance</button><button data-query="pvp">PvP</button><button data-query="shaders">Shaders</button><button data-query="minimap">Minimap</button><button data-query="appleskin">AppleSkin</button><button data-query="voice chat">Voice Chat</button></div>
+        <div class="mod-grid" id="modGrid"><div class="empty-state"><span>◆</span><h3>Search the Modrinth library</h3><p>Compatible Fabric mods will appear here.</p></div></div>
+      </section>
+
+      <section class="page content-page" id="cosmetics">
+        <div class="page-heading"><div><span class="eyebrow">PERSONALIZE YOUR LOOK</span><h2>Cosmetics Vault</h2><p>Choose your launcher identity. In-game sync is coming with the Blazzy Fabric mod.</p></div><span class="credit-pill">◈ 0 BLAZE COINS</span></div>
+        <div class="cosmetic-layout">
+          <div class="character-stage"><div class="stage-glow"></div><div class="player-model"><div class="head"><i></i><i></i></div><div class="body"></div><div class="arm left"></div><div class="arm right"></div><div class="leg left"></div><div class="leg right"></div><div class="cape"></div></div><div class="stage-label"><small>LIVE PREVIEW</small><strong id="previewName">EMBER CAPE</strong></div></div>
+          <div class="cosmetic-panel"><div class="tabs"><button class="active">CAPES</button><button>WINGS</button><button>BADGES</button></div><div class="cosmetic-grid">
+            <button class="cosmetic-card active" data-cosmetic="ember-cape" data-name="Ember Cape"><span class="cape-swatch ember"></span><strong>Ember Cape</strong><small>EQUIPPED</small></button>
+            <button class="cosmetic-card" data-cosmetic="void-cape" data-name="Void Cape"><span class="cape-swatch void"></span><strong>Void Cape</strong><small>OWNED</small></button>
+            <button class="cosmetic-card locked"><span class="cape-swatch solar"></span><strong>Solar Flare</strong><small>LOCKED</small></button>
+            <button class="cosmetic-card locked"><span class="cape-swatch frost"></span><strong>Frost Byte</strong><small>LOCKED</small></button>
+          </div></div>
+        </div>
+      </section>
+
+      <section class="page content-page" id="settings">
+        <div class="page-heading"><div><span class="eyebrow">CLIENT CONTROL</span><h2>Settings</h2><p>Configure your local profile and launcher performance.</p></div><button class="primary-small" id="saveSettings">SAVE CHANGES</button></div>
+        <div class="settings-grid">
+          <article class="setting-card"><h3>Offline Profile</h3><p>Offline accounts work in singleplayer and offline-mode servers.</p><label>USERNAME<input id="username" maxlength="16" placeholder="Player"></label><div class="notice">Microsoft online login will be added before public release.</div></article>
+          <article class="setting-card"><h3>Performance</h3><p>Memory allocated to Minecraft.</p><label>MEMORY <span id="memoryValue">4096 MB</span><input type="range" id="memory" min="2048" max="16384" step="512" value="4096"></label><label>JAVA PATH <input id="javaPath" placeholder="Auto-detect Java 21"></label></article>
+          <article class="setting-card"><h3>Launcher Behavior</h3><label class="toggle-row"><span><b>Motion effects</b><small>Subtle transitions and depth</small></span><input type="checkbox" id="motion" checked><i></i></label><label class="toggle-row"><span><b>Hide after launch</b><small>Restore when Minecraft exits</small></span><input type="checkbox" id="closeOnLaunch"><i></i></label></article>
+          <article class="setting-card"><h3>About</h3><div class="about-brand"><img src="../assets/logo.png"><div><strong>Blazzy Client</strong><small>Version 0.1.0 · Preview</small></div></div><p>Built for Minecraft Java 1.21+ and Fabric. Not affiliated with Mojang or Microsoft.</p></article>
+        </div>
+      </section>
+    </main>
+    <div class="toast" id="toast"></div>
+  </div>
+  <script src="renderer.js"></script>
+</body>
+</html>

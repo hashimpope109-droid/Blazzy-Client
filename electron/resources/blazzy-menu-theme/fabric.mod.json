@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "id": "zzz_blazzy_menu_theme",
+  "version": "3.0.0",
+  "name": "Blazzy Client Menu Theme",
+  "description": "Blazzy black-gray jungle title screen, loading branding, dark-orange controls and module menu identity.",
+  "environment": "client",
+  "license": "MIT",
+  "authors": ["Blazzy Client"],
+  "depends": {
+    "fabricloader": ">=0.16.0",
+    "minecraft": ">=1.21"
+  },
+  "suggests": {
+    "modmenu": "*"
+  }
+}
