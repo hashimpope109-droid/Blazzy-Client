@@ -40,7 +40,7 @@ jobs:
           version="$REQUESTED_VERSION"
           if [ -z "$version" ]; then
             if [ "$EVENT_NAME" = push ]; then
-              version="26.3"
+              version="26.1.2"
             else
               version="$(curl -fsSL https://piston-meta.mojang.com/mc/game/version_manifest_v2.json | jq -r '.latest.release')"
             fi
@@ -162,3 +162,33 @@ jobs:
             /tmp/blazzy-auto-adapter/build.log
             /tmp/blazzy-auto-adapter/build/reports/
           if-no-files-found: ignore
+
+      - name: Publish failure diagnostics
+        if: failure()
+        shell: bash
+        env:
+          REQUESTED_VERSION: ${{ inputs.minecraft_version }}
+        run: |
+          set -u
+          version="$REQUESTED_VERSION"
+          [ -n "$version" ] || version="26.1.2"
+          mkdir -p build-output/failures
+          report="build-output/failures/$version.txt"
+          {
+            echo "Minecraft: $version"
+            echo "Mojang manifest entry:"
+            curl -fsSL https://piston-meta.mojang.com/mc/game/version_manifest_v2.json | jq -c --arg v "$version" '.versions[] | select(.id == $v)' || true
+            echo "Fabric loader profiles:"
+            curl -sS -w '\nHTTP %{http_code}\n' "https://meta.fabricmc.net/v2/versions/loader/$version" | head -c 3000 || true
+            echo
+            echo "Fabric API releases:"
+            curl -fsSL https://maven.fabricmc.net/net/fabricmc/fabric-api/fabric-api/maven-metadata.xml | grep -o "<version>[^<]*+$version</version>" | tail -10 || true
+            echo "Compile log tail:"
+            tail -200 /tmp/blazzy-auto-adapter/build.log 2>/dev/null || true
+          } > "$report"
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add "$report"
+          git commit -m "Record Blazzy HUD compiler diagnostics for Minecraft $version [skip ci]" || exit 0
+          git pull --rebase origin main
+          git push origin HEAD:main
