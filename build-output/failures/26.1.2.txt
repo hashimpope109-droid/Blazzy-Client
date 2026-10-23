@@ -79,12 +79,14 @@ Fabric API releases:
 <version>0.155.2+26.1.2</version>
 <version>0.155.3+26.1.2</version>
 Compile log tail:
-    location: variable gui of type Gui
-  /tmp/blazzy-auto-adapter/src/main/java/gg/blazzy/menu/BlazzyClientMod.java:28: error: cannot find symbol
-              minecraft.gui.setScreen(new BlazzyDashboardScreen(minecraft.gui.screen()));
-                           ^
-    symbol:   method setScreen(BlazzyDashboardScreen)
-    location: variable gui of type Gui
+  /tmp/blazzy-auto-adapter/src/main/java/gg/blazzy/menu/BlazzyClientMod.java:20: error: cannot find symbol
+              GLFW.GLFW_KEY_RIGHT_SHIFT,
+              ^
+    symbol:   variable GLFW
+    location: class BlazzyClientMod
+  /tmp/blazzy-auto-adapter/src/main/java/gg/blazzy/menu/BlazzyClientMod.java:9: error: package org.lwjgl.glfw does not exist
+  import org.lwjgl.glfw.GLFW;
+                       ^
   3 errors
 
 * Try:
@@ -127,21 +129,19 @@ org.gradle.api.tasks.TaskExecutionException: Execution failed for task ':compile
 	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:64)
 	at org.gradle.internal.concurrent.AbstractManagedExecutor$1.run(AbstractManagedExecutor.java:47)
 Caused by: org.gradle.api.internal.tasks.compile.CompilationFailedException: Compilation failed; see the compiler output below.
-/tmp/blazzy-auto-adapter/src/main/java/gg/blazzy/menu/BlazzyDashboardScreen.java:111: error: cannot find symbol
-    public void onClose() { minecraft.gui.setScreen(parent); }
-                                         ^
-  symbol:   method setScreen(Screen)
-  location: variable gui of type Gui
-/tmp/blazzy-auto-adapter/src/main/java/gg/blazzy/menu/BlazzyClientMod.java:28: error: cannot find symbol
-            minecraft.gui.setScreen(new BlazzyDashboardScreen(minecraft.gui.screen()));
-                                                                           ^
-  symbol:   method screen()
-  location: variable gui of type Gui
-/tmp/blazzy-auto-adapter/src/main/java/gg/blazzy/menu/BlazzyClientMod.java:28: error: cannot find symbol
-            minecraft.gui.setScreen(new BlazzyDashboardScreen(minecraft.gui.screen()));
-                         ^
-  symbol:   method setScreen(BlazzyDashboardScreen)
-  location: variable gui of type Gui
+/tmp/blazzy-auto-adapter/src/main/java/gg/blazzy/menu/BlazzyClientMod.java:9: error: package org.lwjgl.glfw does not exist
+import org.lwjgl.glfw.GLFW;
+                     ^
+/tmp/blazzy-auto-adapter/src/main/java/gg/blazzy/menu/BlazzyClientMod.java:19: error: cannot find symbol
+            InputConstants.Type.KEYSYM,
+                               ^
+  symbol:   variable KEYSYM
+  location: class Type
+/tmp/blazzy-auto-adapter/src/main/java/gg/blazzy/menu/BlazzyClientMod.java:20: error: cannot find symbol
+            GLFW.GLFW_KEY_RIGHT_SHIFT,
+            ^
+  symbol:   variable GLFW
+  location: class BlazzyClientMod
 3 errors
 	at org.gradle.api.internal.tasks.compile.JdkJavaCompiler.execute(JdkJavaCompiler.java:89)
 	at org.gradle.api.internal.tasks.compile.JdkJavaCompiler.execute(JdkJavaCompiler.java:50)
