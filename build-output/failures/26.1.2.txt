@@ -9,7 +9,7 @@ Fabric loader profiles:
       "build": 1,
       "maven": "net.fabricmc:fabric-loader:0.20.1",
       "version": "0.20.1",
-      "stable": false
+      "stable": true
     },
     "intermediary": {
       "maven": "net.fabricmc:intermediary:0.0.0",
@@ -66,7 +66,7 @@ Fabric loader profiles:
             "sha256": "1bb99d091fba2597dc6d51193e9bbcf0d8447e7ed96bd8f0198b18152f09655c",
             "sha512": "7330ded981ddeb01b302cba12d56b419207b6b02ebfaf814cbbc3d2d2d1055e055294ce108ac9e4de9e1d0f3c4e0064f133e87e8085922241c1a2e5fa1fedd2c",
             "size": 95628
-   
+    
 Fabric API releases:
 <version>0.149.1+26.1.2</version>
 <version>0.150.0+26.1.2</version>
@@ -277,5 +277,5 @@ import org.lwjgl.glfw.GLFW;
 	... 30 more
 
 
-BUILD FAILED in 19s
+BUILD FAILED in 13s
 1 actionable task: 1 executed
