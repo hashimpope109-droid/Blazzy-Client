@@ -277,5 +277,5 @@ import org.lwjgl.glfw.GLFW;
 	... 30 more
 
 
-BUILD FAILED in 24s
+BUILD FAILED in 13s
 1 actionable task: 1 executed
