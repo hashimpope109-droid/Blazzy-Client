@@ -1,6 +1,6 @@
 Minecraft: 26.1.2
 Mojang manifest entry:
-{"id":"26.1.2","type":"release","url":"https://piston-meta.mojang.com/v1/packages/c193c4e77f6ad181f30f2615544dcf8c7c5093f2/26.1.2.json","time":"2026-11-25T15:26:38+00:00","releaseTime":"2026-04-09T10:12:23+00:00","sha1":"c193c4e77f6ad181f30f2615544dcf8c7c5093f2","complianceLevel":1}
+{"id":"26.1.2","type":"release","url":"https://piston-meta.mojang.com/v1/packages/fe16af51181f0517f35969b56e125d21c21bdf3f/26.1.2.json","time":"2026-11-27T06:56:37+00:00","releaseTime":"2026-04-09T10:12:23+00:00","sha1":"fe16af51181f0517f35969b56e125d21c21bdf3f","complianceLevel":1}
 Fabric loader profiles:
 [
   {
@@ -277,5 +277,5 @@ import org.lwjgl.glfw.GLFW;
 	... 30 more
 
 
-BUILD FAILED in 23s
+BUILD FAILED in 22s
 1 actionable task: 1 executed
